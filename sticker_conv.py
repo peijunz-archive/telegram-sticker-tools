@@ -7,7 +7,6 @@ import os
 import sys
 from PIL import Image
 
-RUN_LIMIT = 1024
 
 WEBP = 'webp'
 WEBM = 'webm'
