@@ -1,6 +1,6 @@
 """Example usage:
 
-python sticker_resize.py gif_path webm_path
+python sticker_conv.py input_path output_path
 """
 
 import os
@@ -9,10 +9,10 @@ from PIL import Image
 
 RUN_LIMIT = 1024
 
-IMG = 'webp'
-VID = 'webm'
+WEBP = 'webp'
+WEBM = 'webm'
 
-format_map = {"png": IMG, "jpg": IMG, "gif": VID}
+format_map = {"png": WEBP, "jpg": WEBP, "gif": WEBM}
 
 
 def get_format(filename):
@@ -30,15 +30,16 @@ def scale_to_box(w, h, box=(512, 512)):
 def convert_single(fmt, input_file, output_file):
     img = Image.open(input_file)
     w, h = scale_to_box(*img.size)
-    if fmt == IMG:
+    if fmt == WEBM:
+        cmd = f'ffmpeg -y -i {input_file} -t 00:00:03 -c vp9 -b:v 0 -crf 40 -vf scale={w}:{h} {output_file}'
+        os.system(cmd)
+    else:
         img_resized = img.resize((w, h))
         img_resized.save(output_file)
-    else:
-        cmd = f'ffmpeg -i {input_file} -t 00:00:03 -c vp9 -b:v 0 -crf 40 -vf scale={w}:{h} {output_file}'
-        os.system(cmd)
         
 
 def process(input_path, output_path):
+    os.makedirs(output_path, exist_ok=True)
     for i, f in enumerate(os.listdir(input_path)):
         new_fmt = format_map.get(get_format(f))
         if not new_fmt:
